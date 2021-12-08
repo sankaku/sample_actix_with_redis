@@ -58,9 +58,7 @@ async fn hello_bb8_redis(pool: web::Data<with_bb8::BB8Pool>) -> impl Responder {
 }
 
 #[get("/deadpool")]
-async fn hello_deadpool_redis(
-    pool: web::Data<with_deadpool::DeadpoolConnection>,
-) -> impl Responder {
+async fn hello_deadpool_redis(pool: web::Data<with_deadpool::DeadpoolPool>) -> impl Responder {
     let id = Uuid::new_v4();
     let key = format!("{}", id);
     let value = "hi";
