@@ -7,3 +7,5 @@ pub mod with_r2d2;
 pub mod with_bb8;
 
 pub mod with_deadpool;
+
+pub mod with_mobc;
