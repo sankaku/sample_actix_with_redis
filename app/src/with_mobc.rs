@@ -5,17 +5,30 @@ use mobc_redis::redis::AsyncCommands;
 use mobc_redis::RedisConnectionManager;
 
 use crate::my_error::MyError;
+use std::time::Duration;
 
 pub type MobcPool = Pool<mobc_redis::RedisConnectionManager>;
 type MobcConnection = Connection<RedisConnectionManager>;
 
 const PREFIX: &'static str = "with_mobc";
 const TTL: usize = 60 * 5;
+const MAX_POOL_SIZE: u64 = 30;
+const CONNECTION_TIMEOUT: Option<Duration> = Some(Duration::from_secs(10));
+
+/// Creates connection pool with default settings
+pub fn _simple_create_pool(host_addr: &str) -> MobcPool {
+    let client = redis::Client::open(host_addr).unwrap();
+    let manager = RedisConnectionManager::new(client);
+    Pool::builder().build(manager)
+}
 
 pub fn create_pool(host_addr: &str) -> MobcPool {
     let client = redis::Client::open(host_addr).unwrap();
     let manager = RedisConnectionManager::new(client);
-    Pool::builder().max_open(10).build(manager)
+    Pool::builder()
+        .max_open(MAX_POOL_SIZE)
+        .get_timeout(CONNECTION_TIMEOUT) // this method SETs timeout
+        .build(manager)
 }
 
 async fn create_connection(pool: &MobcPool) -> Result<MobcConnection, MyError> {
