@@ -1066,6 +1066,7 @@ dependencies = [
  "itoa",
  "percent-encoding",
  "pin-project-lite",
+ "r2d2",
  "sha1",
  "tokio",
  "tokio-util",
@@ -1131,9 +1132,9 @@ dependencies = [
  "deadpool-redis",
  "mobc",
  "mobc-redis",
+ "r2d2",
  "r2d2_redis",
  "redis 0.21.4",
- "tokio",
  "uuid",
 ]
 
@@ -1426,19 +1427,7 @@ dependencies = [
  "parking_lot",
  "pin-project-lite",
  "signal-hook-registry",
- "tokio-macros",
  "winapi",
-]
-
-[[package]]
-name = "tokio-macros"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9efc1aba077437943f7515666aa2b882dfabfbfdf89c819ea75a8d6e9eaba5e"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]

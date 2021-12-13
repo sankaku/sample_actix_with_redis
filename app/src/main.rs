@@ -4,6 +4,7 @@ use sample_actix_with_redis::with_bb8;
 use sample_actix_with_redis::with_deadpool;
 use sample_actix_with_redis::with_mobc;
 use sample_actix_with_redis::with_r2d2;
+use sample_actix_with_redis::with_r2d2_feature;
 
 use uuid::Uuid;
 
@@ -30,6 +31,20 @@ async fn hello_direct_redis() -> impl Responder {
     match result {
         Ok(_) => HttpResponse::Ok().body(key),
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
+}
+
+#[get("/r2d2_feature")]
+async fn hello_r2d2_feature_redis(
+    pool: web::Data<with_r2d2_feature::R2D2FeaturePool>,
+) -> impl Responder {
+    let id = Uuid::new_v4();
+    let key = format!("{}", id);
+    let value = "hi";
+    let result = with_r2d2_feature::set(&pool, &key, value);
+    match result {
+        Ok(_) => HttpResponse::Ok().body(key),
+        Err(e) => HttpResponse::InternalServerError().body(e.msg),
     }
 }
 
@@ -88,6 +103,7 @@ async fn main() -> std::io::Result<()> {
     let direct_connection = direct::create_connection()
         .await
         .expect("failed to create direct connection");
+    let r2d2_feature_pool = with_r2d2_feature::create_pool(host).unwrap();
     let r2d2_pool = with_r2d2::create_pool(host).unwrap();
     let bb8_pool = with_bb8::create_pool(host).await.unwrap();
     let deadpool_pool = with_deadpool::create_pool(host).unwrap();
@@ -96,6 +112,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         // TODO: needs `move`?
         App::new()
+            .app_data(web::Data::new(r2d2_feature_pool.clone()))
             .app_data(web::Data::new(r2d2_pool.clone()))
             .app_data(web::Data::new(bb8_pool.clone()))
             .app_data(web::Data::new(deadpool_pool.clone()))
@@ -103,6 +120,7 @@ async fn main() -> std::io::Result<()> {
             .service(hello)
             .service(echo)
             .service(hello_direct_redis)
+            .service(hello_r2d2_feature_redis)
             .service(hello_r2d2_redis)
             .service(hello_bb8_redis)
             .service(hello_deadpool_redis)
