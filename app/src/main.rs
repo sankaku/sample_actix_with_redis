@@ -13,29 +13,20 @@ async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
-}
-
 #[get("/direct")]
-async fn hello_direct_redis() -> impl Responder {
+async fn set_direct(client: web::Data<direct::DirectClient>) -> impl Responder {
     let id = Uuid::new_v4();
     let key = format!("{}", id);
     let value = "hi";
-    let result = direct::set(&key, value).await;
+    let result = direct::set(&client, &key, value).await;
     match result {
         Ok(_) => HttpResponse::Ok().body(key),
-        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+        Err(e) => HttpResponse::InternalServerError().body(e.msg),
     }
 }
 
 #[get("/r2d2_feature")]
-async fn hello_r2d2_feature_redis(
+async fn set_with_r2d2_feature(
     pool: web::Data<with_r2d2_feature::R2D2FeaturePool>,
 ) -> impl Responder {
     let id = Uuid::new_v4();
@@ -49,7 +40,7 @@ async fn hello_r2d2_feature_redis(
 }
 
 #[get("/r2d2")]
-async fn hello_r2d2_redis(pool: web::Data<with_r2d2::R2D2Pool>) -> impl Responder {
+async fn set_with_r2d2(pool: web::Data<with_r2d2::R2D2Pool>) -> impl Responder {
     let id = Uuid::new_v4();
     let key = format!("{}", id);
     let value = "hi";
@@ -61,7 +52,7 @@ async fn hello_r2d2_redis(pool: web::Data<with_r2d2::R2D2Pool>) -> impl Responde
 }
 
 #[get("/bb8")]
-async fn hello_bb8_redis(pool: web::Data<with_bb8::BB8Pool>) -> impl Responder {
+async fn set_with_bb8(pool: web::Data<with_bb8::BB8Pool>) -> impl Responder {
     let id = Uuid::new_v4();
     let key = format!("{}", id);
     let value = "hi";
@@ -73,7 +64,7 @@ async fn hello_bb8_redis(pool: web::Data<with_bb8::BB8Pool>) -> impl Responder {
 }
 
 #[get("/deadpool")]
-async fn hello_deadpool_redis(pool: web::Data<with_deadpool::DeadpoolPool>) -> impl Responder {
+async fn set_with_deadpool(pool: web::Data<with_deadpool::DeadpoolPool>) -> impl Responder {
     let id = Uuid::new_v4();
     let key = format!("{}", id);
     let value = "hi";
@@ -85,7 +76,7 @@ async fn hello_deadpool_redis(pool: web::Data<with_deadpool::DeadpoolPool>) -> i
 }
 
 #[get("/mobc")]
-async fn hello_mobc_redis(pool: web::Data<with_mobc::MobcPool>) -> impl Responder {
+async fn set_with_mobc(pool: web::Data<with_mobc::MobcPool>) -> impl Responder {
     let id = Uuid::new_v4();
     let key = format!("{}", id);
     let value = "hi";
@@ -99,10 +90,7 @@ async fn hello_mobc_redis(pool: web::Data<with_mobc::MobcPool>) -> impl Responde
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let host = "redis://127.0.0.1/";
-    // use this conn every time?
-    let direct_connection = direct::create_connection()
-        .await
-        .expect("failed to create direct connection");
+    let direct_client = direct::create_client(host).await.unwrap();
     let r2d2_feature_pool = with_r2d2_feature::create_pool(host).unwrap();
     let r2d2_pool = with_r2d2::create_pool(host).unwrap();
     let bb8_pool = with_bb8::create_pool(host).await.unwrap();
@@ -110,23 +98,20 @@ async fn main() -> std::io::Result<()> {
     let mobc_pool = with_mobc::create_pool(host);
 
     HttpServer::new(move || {
-        // TODO: needs `move`?
         App::new()
+            .app_data(web::Data::new(direct_client.clone()))
             .app_data(web::Data::new(r2d2_feature_pool.clone()))
             .app_data(web::Data::new(r2d2_pool.clone()))
             .app_data(web::Data::new(bb8_pool.clone()))
             .app_data(web::Data::new(deadpool_pool.clone()))
             .app_data(web::Data::new(mobc_pool.clone()))
             .service(hello)
-            .service(echo)
-            .service(hello_direct_redis)
-            .service(hello_r2d2_feature_redis)
-            .service(hello_r2d2_redis)
-            .service(hello_bb8_redis)
-            .service(hello_deadpool_redis)
-            .service(hello_deadpool_redis)
-            .service(hello_mobc_redis)
-            .route("/hey", web::get().to(manual_hello))
+            .service(set_direct)
+            .service(set_with_r2d2_feature)
+            .service(set_with_r2d2)
+            .service(set_with_bb8)
+            .service(set_with_deadpool)
+            .service(set_with_mobc)
     })
     .bind("127.0.0.1:8080")?
     .run()

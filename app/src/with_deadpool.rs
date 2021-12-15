@@ -11,7 +11,7 @@ use crate::my_error::MyError;
 pub type DeadpoolPool = Pool; // TODO OK?
 type DeadpoolConnection = Connection;
 
-const PREFIX: &'static str = "with_deadpool";
+const PREFIX: &str = "with_deadpool";
 const TTL: usize = 60 * 5;
 const MAX_POOL_SIZE: usize = 30;
 const WAIT_TIMEOUT: Option<Duration> = Some(Duration::from_secs(10));

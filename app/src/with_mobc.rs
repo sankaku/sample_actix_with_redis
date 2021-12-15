@@ -10,7 +10,7 @@ use std::time::Duration;
 pub type MobcPool = Pool<mobc_redis::RedisConnectionManager>;
 type MobcConnection = Connection<RedisConnectionManager>;
 
-const PREFIX: &'static str = "with_mobc";
+const PREFIX: &str = "with_mobc";
 const TTL: usize = 60 * 5;
 const MAX_POOL_SIZE: u64 = 30;
 const CONNECTION_TIMEOUT: Option<Duration> = Some(Duration::from_secs(10));

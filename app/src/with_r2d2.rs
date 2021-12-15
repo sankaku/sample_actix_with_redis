@@ -7,7 +7,7 @@ use std::time::Duration;
 pub type R2D2Pool = r2d2::Pool<RedisConnectionManager>;
 type R2D2PooledCon = PooledConnection<RedisConnectionManager>;
 
-const PREFIX: &'static str = "with_r2d2";
+const PREFIX: &str = "with_r2d2";
 const TTL: usize = 60 * 5;
 const MAX_POOL_SIZE: u32 = 30;
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);

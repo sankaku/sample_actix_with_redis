@@ -5,7 +5,7 @@ use std::time::Duration;
 pub type R2D2FeaturePool = r2d2::Pool<redis::Client>;
 type R2d2FeaturePooledCon = r2d2::PooledConnection<redis::Client>;
 
-const PREFIX: &'static str = "with_r2d2_feature";
+const PREFIX: &str = "with_r2d2_feature";
 const TTL: usize = 60 * 5;
 const MAX_POOL_SIZE: u32 = 30;
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
