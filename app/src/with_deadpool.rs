@@ -1,14 +1,11 @@
 use std::time::Duration;
 
-use deadpool_redis::{
-    redis::{cmd, FromRedisValue},
-    Config, Connection, Manager, Pool, Runtime,
-};
+use deadpool_redis::{Config, Connection, Pool, Runtime};
 use redis::AsyncCommands;
 
 use crate::my_error::MyError;
 
-pub type DeadpoolPool = Pool; // TODO OK?
+pub type DeadpoolPool = Pool;
 type DeadpoolConnection = Connection;
 
 const PREFIX: &str = "with_deadpool";
@@ -21,7 +18,7 @@ pub fn _simple_create_pool(host_addr: &str) -> Result<DeadpoolPool, MyError> {
     let config = Config::from_url(host_addr);
     config
         .create_pool(Some(Runtime::Tokio1))
-        .map_err(|e| MyError::new_str("failed to create pool"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 pub fn create_pool(host_addr: &str) -> Result<DeadpoolPool, MyError> {
@@ -35,13 +32,13 @@ pub fn create_pool(host_addr: &str) -> Result<DeadpoolPool, MyError> {
                 .build()
                 .unwrap() // TODO don't panic. flat_map can't be used???
         })
-        .map_err(|e| MyError::new_str("failed to create pool"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 async fn create_connection(pool: &DeadpoolPool) -> Result<DeadpoolConnection, MyError> {
     pool.get()
         .await
-        .map_err(|e| MyError::new_str("failed to get connection"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 fn get_key(key: &str) -> String {
@@ -53,7 +50,7 @@ pub async fn set(pool: &DeadpoolPool, key: &str, value: &str) -> Result<(), MyEr
     let redis_key = get_key(key);
     con.set_ex(redis_key, value, TTL)
         .await
-        .map_err(|e| MyError::new_str("failed to set"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 pub async fn get(pool: &DeadpoolPool, key: &str) -> Result<String, MyError> {
@@ -61,5 +58,5 @@ pub async fn get(pool: &DeadpoolPool, key: &str) -> Result<String, MyError> {
     let redis_key = get_key(key);
     con.get(redis_key)
         .await
-        .map_err(|e| MyError::new_str("failed to get"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }

@@ -34,7 +34,7 @@ pub fn create_pool(host_addr: &str) -> MobcPool {
 async fn create_connection(pool: &MobcPool) -> Result<MobcConnection, MyError> {
     pool.get()
         .await
-        .map_err(|e| MyError::new_str("failed to create connection"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 fn get_key(base: &str) -> String {
@@ -46,7 +46,7 @@ pub async fn set(pool: &MobcPool, key: &str, value: &str) -> Result<(), MyError>
     let mut con = create_connection(pool).await?;
     con.set_ex(redis_key, value, TTL)
         .await
-        .map_err(|e| MyError::new_str("failed to set"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 pub async fn get(pool: &MobcPool, key: &str) -> Result<String, MyError> {
@@ -54,5 +54,5 @@ pub async fn get(pool: &MobcPool, key: &str) -> Result<String, MyError> {
     let mut con = create_connection(pool).await?;
     con.get(redis_key)
         .await
-        .map_err(|e| MyError::new_str("failed to set"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }

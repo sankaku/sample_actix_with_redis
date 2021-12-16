@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use sample_actix_with_redis::direct;
 use sample_actix_with_redis::with_bb8;
 use sample_actix_with_redis::with_deadpool;

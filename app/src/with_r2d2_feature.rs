@@ -12,23 +12,21 @@ const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Creates connection pool with default settings
 pub fn _simple_create_pool(host_addr: &str) -> Result<R2D2FeaturePool, MyError> {
-    let client =
-        redis::Client::open(host_addr).map_err(|e| MyError::new_str("failed to create client"))?;
+    let client = redis::Client::open(host_addr).map_err(|e| MyError::new_string(e.to_string()))?;
 
     let pool = r2d2::Pool::builder()
         .build(client)
-        .map_err(|_| MyError::new_str("failed to create pool"));
+        .map_err(|e| MyError::new_string(e.to_string()));
     pool
 }
 
 pub fn create_pool(host_addr: &str) -> Result<R2D2FeaturePool, MyError> {
-    let client =
-        redis::Client::open(host_addr).map_err(|e| MyError::new_str("failed to create client"))?;
+    let client = redis::Client::open(host_addr).map_err(|e| MyError::new_string(e.to_string()))?;
     let pool = r2d2::Pool::builder()
         .max_size(MAX_POOL_SIZE)
         .connection_timeout(CONNECTION_TIMEOUT)
         .build(client)
-        .map_err(|_| MyError::new_str("failed to create pool"));
+        .map_err(|e| MyError::new_string(e.to_string()));
     pool
 }
 
@@ -37,8 +35,7 @@ fn get_key(base: &str) -> String {
 }
 
 fn create_connection(pool: &R2D2FeaturePool) -> Result<R2d2FeaturePooledCon, MyError> {
-    pool.get()
-        .map_err(|_| MyError::new_str("failed to create connection}"))
+    pool.get().map_err(|e| MyError::new_string(e.to_string()))
 }
 
 pub fn set(pool: &R2D2FeaturePool, key: &str, value: &str) -> Result<(), MyError> {

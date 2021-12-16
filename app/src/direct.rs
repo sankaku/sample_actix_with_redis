@@ -9,14 +9,14 @@ const PREFIX: &str = "direct";
 const TTL: usize = 60 * 5;
 
 pub async fn create_client(host_addr: &str) -> Result<DirectClient, MyError> {
-    redis::Client::open(host_addr).map_err(|_| MyError::new_str("failed to create client"))
+    redis::Client::open(host_addr).map_err(|e| MyError::new_string(e.to_string()))
 }
 
 pub async fn create_connection(client: &DirectClient) -> Result<Connection, MyError> {
     client
         .get_async_connection()
         .await
-        .map_err(|e| MyError::new_str("failed to create connection"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 fn get_key(key: &str) -> String {
@@ -28,12 +28,12 @@ pub async fn set(client: &DirectClient, key: &str, value: &str) -> Result<String
     let redis_key = get_key(key);
     con.set_ex(redis_key, value, TTL)
         .await
-        .map_err(|e| MyError::new_str("failed to set"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 pub async fn get(client: &DirectClient, key: &str) -> Result<(), MyError> {
     let mut con = create_connection(client).await?;
     let redis_key = get_key(key);
     con.get(redis_key)
         .await
-        .map_err(|e| MyError::new_str("failed to set"))
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
