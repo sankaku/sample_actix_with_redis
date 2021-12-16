@@ -14,20 +14,18 @@ const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 pub fn _simple_create_pool(host_addr: &str) -> Result<R2D2Pool, MyError> {
     let client = redis::Client::open(host_addr).map_err(|e| MyError::new_string(e.to_string()))?;
 
-    let pool = r2d2::Pool::builder()
+    r2d2::Pool::builder()
         .build(client)
-        .map_err(|e| MyError::new_string(e.to_string()));
-    pool
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 pub fn create_pool(host_addr: &str) -> Result<R2D2Pool, MyError> {
     let client = redis::Client::open(host_addr).map_err(|e| MyError::new_string(e.to_string()))?;
-    let pool = r2d2::Pool::builder()
+    r2d2::Pool::builder()
         .max_size(MAX_POOL_SIZE)
         .connection_timeout(CONNECTION_TIMEOUT)
         .build(client)
-        .map_err(|e| MyError::new_string(e.to_string()));
-    pool
+        .map_err(|e| MyError::new_string(e.to_string()))
 }
 
 fn get_key(base: &str) -> String {

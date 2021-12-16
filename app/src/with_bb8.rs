@@ -6,7 +6,7 @@ use bb8_redis::{bb8::Pool, redis::AsyncCommands, RedisConnectionManager};
 pub type BB8Pool = Pool<RedisConnectionManager>;
 // type BB8Connetion = &mut PooledConnection<RedisConnectionManager>; // TODO can't declare this type due to lifetime???
 
-const PREFIX: &'static str = "with_bb8";
+const PREFIX: &str = "with_bb8";
 const TTL: usize = 60 * 5;
 const MAX_POOL_SIZE: u32 = 30;
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
