@@ -4,7 +4,7 @@ pub mod my_error;
 pub mod direct;
 
 /// with r2d2 pool of redis-rs feature
-pub mod with_r2d2_feature;
+pub mod with_r2d2;
 
 /// with r2d2 pool of r2d2-redis
 pub mod with_old_r2d2;
