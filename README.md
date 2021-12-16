@@ -10,20 +10,14 @@ Usage sample for redis crates below with actix-web.
   `with_bb8.rs`.
 - [deadpool-redis](https://github.com/bikeshedder/deadpool)  
   `with_deadpool.rs`.
-- [mobc](https://github.com/importcjj/mobc)  
+- [mobc-redis](https://github.com/importcjj/mobc)  
   `with_mobc.rs`.
 - [r2d2-redis](https://github.com/sorccu/r2d2-redis)  
-  `with_old_r2d2.rs`.
+  `with_alt_r2d2.rs`.
 
 ## Requirements
 - cargo
 - docker-compose
-
-## Build
-```sh
-cd app
-cargo build
-```
 
 ## Run
 ```sh
@@ -33,7 +27,9 @@ cd app
 cargo run
 
 # to stop...
+
 # Press Ctrl-C
+# and
 cd ../
 docker-compose down
 ```
@@ -41,7 +37,7 @@ docker-compose down
 ## Endpoints
 All endpoints accept HTTP GET method.
 
-`uuid` in `localhost:8080/foo/{uuid}` is the string you'll get as the response of `localhost:8080/foo`.
+`uuid` in `/foo/{uuid}` is the string you'll get as the response of `/foo`.
 
 - `/direct` 
 - `/direct/{uuid}`
@@ -53,8 +49,8 @@ All endpoints accept HTTP GET method.
 - `/deadpool/{uuid}`
 - `/mobc` 
 - `/mobc/{uuid}`
-- `/old_r2d2` 
-- `/old_r2d2/{uuid}`
+- `/alt_r2d2` 
+- `/alt_r2d2/{uuid}`
 
 
 Example
