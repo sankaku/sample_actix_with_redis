@@ -25,6 +25,18 @@ async fn set_direct(client: web::Data<direct::DirectClient>) -> impl Responder {
     }
 }
 
+#[get("/direct/{id}")]
+async fn get_direct(
+    client: web::Data<direct::DirectClient>,
+    info: web::Path<(String,)>,
+) -> impl Responder {
+    let result = direct::get(&client, &info.0).await;
+    match result {
+        Ok(r) => HttpResponse::Ok().body(r),
+        Err(e) => HttpResponse::NotFound().body(e.msg),
+    }
+}
+
 #[get("/r2d2")]
 async fn set_with_r2d2(pool: web::Data<with_r2d2::R2D2Pool>) -> impl Responder {
     let id = Uuid::new_v4();
@@ -34,6 +46,18 @@ async fn set_with_r2d2(pool: web::Data<with_r2d2::R2D2Pool>) -> impl Responder {
     match result {
         Ok(_) => HttpResponse::Ok().body(key),
         Err(e) => HttpResponse::InternalServerError().body(e.msg),
+    }
+}
+
+#[get("/r2d2/{id}")]
+async fn get_with_r2d2(
+    pool: web::Data<with_r2d2::R2D2Pool>,
+    info: web::Path<(String,)>,
+) -> impl Responder {
+    let result = with_r2d2::get(&pool, &info.0);
+    match result {
+        Ok(r) => HttpResponse::Ok().body(r),
+        Err(e) => HttpResponse::NotFound().body(e.msg),
     }
 }
 
@@ -49,6 +73,18 @@ async fn set_with_old_r2d2(pool: web::Data<with_old_r2d2::OldR2D2Pool>) -> impl 
     }
 }
 
+#[get("/old_r2d2/{id}")]
+async fn get_with_old_r2d2(
+    pool: web::Data<with_old_r2d2::OldR2D2Pool>,
+    info: web::Path<(String,)>,
+) -> impl Responder {
+    let result = with_old_r2d2::get(&pool, &info.0);
+    match result {
+        Ok(r) => HttpResponse::Ok().body(r),
+        Err(e) => HttpResponse::NotFound().body(e.msg),
+    }
+}
+
 #[get("/bb8")]
 async fn set_with_bb8(pool: web::Data<with_bb8::BB8Pool>) -> impl Responder {
     let id = Uuid::new_v4();
@@ -58,6 +94,18 @@ async fn set_with_bb8(pool: web::Data<with_bb8::BB8Pool>) -> impl Responder {
     match result {
         Ok(_) => HttpResponse::Ok().body(key),
         Err(e) => HttpResponse::InternalServerError().body(e.msg),
+    }
+}
+
+#[get("/bb8/{id}")]
+async fn get_with_bb8(
+    pool: web::Data<with_bb8::BB8Pool>,
+    info: web::Path<(String,)>,
+) -> impl Responder {
+    let result = with_bb8::get(&pool, &info.0).await;
+    match result {
+        Ok(r) => HttpResponse::Ok().body(r),
+        Err(e) => HttpResponse::NotFound().body(e.msg),
     }
 }
 
@@ -73,6 +121,18 @@ async fn set_with_deadpool(pool: web::Data<with_deadpool::DeadpoolPool>) -> impl
     }
 }
 
+#[get("/deadpool/{id}")]
+async fn get_with_deadpool(
+    pool: web::Data<with_deadpool::DeadpoolPool>,
+    info: web::Path<(String,)>,
+) -> impl Responder {
+    let result = with_deadpool::get(&pool, &info.0).await;
+    match result {
+        Ok(r) => HttpResponse::Ok().body(r),
+        Err(e) => HttpResponse::NotFound().body(e.msg),
+    }
+}
+
 #[get("/mobc")]
 async fn set_with_mobc(pool: web::Data<with_mobc::MobcPool>) -> impl Responder {
     let id = Uuid::new_v4();
@@ -82,6 +142,18 @@ async fn set_with_mobc(pool: web::Data<with_mobc::MobcPool>) -> impl Responder {
     match result {
         Ok(_) => HttpResponse::Ok().body(key),
         Err(e) => HttpResponse::InternalServerError().body(e.msg),
+    }
+}
+
+#[get("/mobc/{id}")]
+async fn get_with_mobc(
+    pool: web::Data<with_mobc::MobcPool>,
+    info: web::Path<(String,)>,
+) -> impl Responder {
+    let result = with_mobc::get(&pool, &info.0).await;
+    match result {
+        Ok(r) => HttpResponse::Ok().body(r),
+        Err(e) => HttpResponse::NotFound().body(e.msg),
     }
 }
 
@@ -105,11 +177,17 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(mobc_pool.clone()))
             .service(hello)
             .service(set_direct)
+            .service(get_direct)
             .service(set_with_r2d2)
+            .service(get_with_r2d2)
             .service(set_with_old_r2d2)
+            .service(get_with_old_r2d2)
             .service(set_with_bb8)
+            .service(get_with_bb8)
             .service(set_with_deadpool)
+            .service(get_with_deadpool)
             .service(set_with_mobc)
+            .service(get_with_mobc)
     })
     .bind("127.0.0.1:8080")?
     .run()

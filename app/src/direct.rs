@@ -30,7 +30,7 @@ pub async fn set(client: &DirectClient, key: &str, value: &str) -> Result<String
         .await
         .map_err(|e| MyError::new_string(e.to_string()))
 }
-pub async fn get(client: &DirectClient, key: &str) -> Result<(), MyError> {
+pub async fn get(client: &DirectClient, key: &str) -> Result<String, MyError> {
     let mut con = create_connection(client).await?;
     let redis_key = get_key(key);
     con.get(redis_key)

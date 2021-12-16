@@ -48,7 +48,7 @@ pub fn set(pool: &OldR2D2Pool, key: &str, value: &str) -> Result<(), MyError> {
         .map_err(|e| MyError::new_string(e.to_string()))
 }
 
-pub fn get(pool: &OldR2D2Pool, key: &str) -> Result<(), MyError> {
+pub fn get(pool: &OldR2D2Pool, key: &str) -> Result<String, MyError> {
     let mut con = create_connection(pool)?;
     let redis_key = get_key(key);
     con.get(redis_key)
