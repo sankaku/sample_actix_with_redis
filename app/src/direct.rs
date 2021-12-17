@@ -8,7 +8,7 @@ pub type DirectClient = Client;
 const PREFIX: &str = "direct";
 const TTL: usize = 60 * 5;
 
-pub async fn create_client(host_addr: &str) -> Result<DirectClient, MyError> {
+pub fn create_client(host_addr: &str) -> Result<DirectClient, MyError> {
     redis::Client::open(host_addr).map_err(|e| MyError::new_string(e.to_string()))
 }
 
@@ -30,6 +30,7 @@ pub async fn set(client: &DirectClient, key: &str, value: &str) -> Result<String
         .await
         .map_err(|e| MyError::new_string(e.to_string()))
 }
+
 pub async fn get(client: &DirectClient, key: &str) -> Result<String, MyError> {
     let mut con = create_connection(client).await?;
     let redis_key = get_key(key);

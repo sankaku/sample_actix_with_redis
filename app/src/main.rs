@@ -160,7 +160,7 @@ async fn get_with_mobc(
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let host = "redis://127.0.0.1/";
-    let direct_client = direct::create_client(host).await.unwrap();
+    let direct_client = direct::create_client(host).unwrap();
     let r2d2_pool = with_r2d2::create_pool(host).unwrap();
     let bb8_pool = with_bb8::create_pool(host).await.unwrap();
     let deadpool_pool = with_deadpool::create_pool(host).unwrap();
